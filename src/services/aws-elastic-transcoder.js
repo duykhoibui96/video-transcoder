@@ -91,9 +91,11 @@ export async function handleWebhookMsg(ctx) {
   }
 }
 
-function _calculateOutputVideoResolution(videoName) {
-  // example for videoName: 1_1024.mp4
+function _calculateOutputVideoResolution(videoPath) {
+  // example for videoPath: sessions/1234/1_1024.mp4
   // we can see the resolution of video is 1024
+  const videoPathParts = videoPath.split('/')
+  const videoName = videoPathParts[videoPathParts.length - 1]
   const videoNameParts = videoName.split(/[._]/)
 
   return Number(videoNameParts[1]) || 1024
