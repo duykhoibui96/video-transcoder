@@ -25,19 +25,18 @@ const presetMap = [
   }
 ]
 
-export function createJob({sessionId, userToken, videoFiles = []}) {
-  if (!videoFiles.length) {
+export function createJob({sessionId, userToken, videos = [], resolution, udid}) {
+  if (!videos.length) {
     throw new Error('No input videos found.')
   }
 
-  const outputKey = `sessions/${sessionId}/videos/Video_${sessionId}.mp4`
-  const outputVideoResolution = _calculateOutputVideoResolution(videoFiles[0])
+  const outputKey = `sessions/${sessionId}/videos/Video_${udid}.mp4`
   const params = {
     PipelineId: AWS_ELASTIC_TRANSCODER_PIPELINE_ID,
     Inputs: [],
     Outputs: [{
       Key: outputKey,
-      PresetId: _getPresetId(outputVideoResolution),
+      PresetId: _getPresetId(resolution),
       Rotate: 'auto'
     }],
     UserMetadata: {
@@ -46,7 +45,9 @@ export function createJob({sessionId, userToken, videoFiles = []}) {
     }
   }
 
-  videoFiles.forEach((key) => {
+  const sortedVideos = _sortVideos(videos)
+
+  sortedVideos.forEach((key) => {
     const input = {
       Key: key,
       FrameRate: 'auto',
@@ -91,14 +92,14 @@ export async function handleWebhookMsg(ctx) {
   }
 }
 
-function _calculateOutputVideoResolution(videoPath) {
-  // example for videoPath: sessions/1234/1_1024.mp4
-  // we can see the resolution of video is 1024
-  const videoPathParts = videoPath.split('/')
-  const videoName = videoPathParts[videoPathParts.length - 1]
-  const videoNameParts = videoName.split(/[._]/)
-
-  return Number(videoNameParts[1]) || 1024
+function _sortVideos(videos) {
+  return videos.sort((cur, next) => {
+    const currentVideoPrefixParts = cur.split('_')[0].split('/')
+    const currentIndex = Number(currentVideoPrefixParts[currentVideoPrefixParts.length - 1], 10)
+    const nextVideoPrefixParts = next.split('_')[0].split('/')
+    const nextIndex = Number(nextVideoPrefixParts[nextVideoPrefixParts.length - 1], 10)
+    return currentIndex - nextIndex
+  })
 }
 
 function _getPresetId(resolution) {

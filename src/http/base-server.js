@@ -8,6 +8,7 @@ import moment from 'moment'
 import path from 'path'
 import merge from 'lodash/merge'
 import BPromise from 'bluebird'
+import {debug} from '@kobiton/core-util'
 import {PORT, LOGSTASH_SERVER, ENVIRONMENT} from '../config'
 import {NAMESPACE} from '../enums'
 
@@ -69,5 +70,11 @@ export default class BaseServer {
 
     const routes = this._initRoutes(app.config.controller)
     app.use(routes)
+
+    debug.enable('*', {
+      logstash: LOGSTASH_SERVER,
+      environment: ENVIRONMENT,
+      component: 'video-transcoder'
+    })
   }
 }

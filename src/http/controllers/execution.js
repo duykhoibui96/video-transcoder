@@ -8,10 +8,10 @@ export default class ExecutionController extends BaseController {
 
   @post('/')
   async transcodeVideo(ctx) {
-    const {sessionId, userToken, videoFiles} = ctx.request.body
+    const {sessionId, token, resolution, videos, udid} = ctx.request.body
 
     try {
-      const msg = await createJob({sessionId, userToken, videoFiles})
+      const msg = await createJob({sessionId, userToken: token, videos, resolution, udid})
     
       ctx.body = msg
     } catch (err) {
