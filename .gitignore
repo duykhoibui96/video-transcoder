@@ -1,0 +1,14 @@
+# MacOS
+.DS_Store
+
+# Build dir
+build
+
+# Node.js
+node_modules
+yarn-error.log
+
+# IDE
+.idea
+
+temp
